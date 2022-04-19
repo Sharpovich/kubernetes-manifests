@@ -1,0 +1,5 @@
+image: sharpov210/lesson1
+replicas: 3
+secret:
+  name: load-secret
+  password: loadqwerty
