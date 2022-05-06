@@ -1,0 +1,43 @@
+---
+- name: Deploy / build server
+  hosts: deploy
+  roles:
+    - role: preconfig
+      tags: preconfig
+    - role: deploy
+      tags: deploy
+    - role: build
+      tags: build
+    - role: swarm_init
+      tags: swarm_init
+    - role: swarm_leave
+      node_name: 
+      tags: swarm_leave
+    
+
+- name: Manager
+  hosts: managers
+  roles:
+    - role: preconfig
+      tags: preconfig
+    - role: swarm_join
+      type: manager
+      tags: swarm_join
+    
+
+- name: Worker
+  hosts: workers
+  roles:
+    - role: preconfig
+      tags: preconfig
+    - role: swarm_join
+      type: worker
+      tags: swarm_join
+  post_tasks:
+    - name: Clear folder tokens
+      file:
+        path: ./tokens
+        state: absent
+      ignore_errors: true
+      delegate_to: localhost
+      tags: swarm_join

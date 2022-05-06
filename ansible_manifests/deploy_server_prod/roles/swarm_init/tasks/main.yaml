@@ -1,0 +1,26 @@
+---
+- name: Init swarm
+  community.docker.docker_swarm:
+    state: present
+    advertise_addr: "{{ advertise_addr }}"
+  register: token
+
+- name: Save tokens
+  set_fact:
+    token_manager: "{{ token.swarm_facts.JoinTokens.Manager }}"
+    token_worker: "{{ token.swarm_facts.JoinTokens.Worker }}"
+    cacheable: true
+
+# - name: Save token manager
+#   copy:
+#     dest: ./tokens/token-manager
+#     content: "{{ token.swarm_facts.JoinTokens.Manager }}"
+#     mode: '0644'
+#   delegate_to: localhost
+
+# - name: Save token worker
+#   copy:
+#     dest: ./tokens/token-worker
+#     content: "{{ token.swarm_facts.JoinTokens.Worker }}"
+#     mode: '0644'
+#   delegate_to: localhost

@@ -1,0 +1,15 @@
+---
+- name: user
+  hosts: demo
+  tasks:
+    - name: Create user
+      vars:
+        user: host
+      user:
+        name: "{{ user }}"
+        state: present
+      become: true
+      # возможности дебагинга с выводом в output
+      register: out
+    - debug:
+        var: out

@@ -1,0 +1,14 @@
+---
+- name: user
+  hosts: demo
+  tasks:
+    - name: Create user
+      vars:
+        user: host
+      user:
+        name: "{{ user }}"
+        state: present
+      become: true
+      # функция debugger для установки правила вывода
+      # отладочной информации
+      debugger: always

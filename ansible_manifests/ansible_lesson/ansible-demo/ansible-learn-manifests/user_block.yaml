@@ -1,0 +1,38 @@
+---
+- name: user
+  hosts: demo
+  # все ошибки фатальны
+  any_errors_fatal: true
+  tasks:
+    - name: Preconfig block
+      block:
+        - name: Create user
+          vars:
+            user: host
+          user:
+            name: "{{ user }}"
+            state: present
+          register: error
+          # игнорирование ошибки
+          ignore_error: true
+        - name: Install curl
+          apt:
+            name: curl
+            update-cache: yes
+          register: error
+          # установка условия для падения
+        - name: Fail on FAILED
+          command: echo "FAILED"
+          register: command_result
+          failed_when: "'FAILED in command_result.stdout'"
+      become: true
+      # установка правил и условий выполнения блоков и задач
+      when: ansible_facts['distribution'] == 'Ubuntu'
+      rescue:
+        - name: Some error print
+          debug:
+            var: error
+      always:
+        - name: Reboot
+          debug:
+            msg: "Good reboot"

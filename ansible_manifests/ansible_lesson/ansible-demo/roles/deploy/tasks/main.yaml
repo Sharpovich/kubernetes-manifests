@@ -1,0 +1,221 @@
+---
+- name: Task deploy
+  command: "echo {{ test }}"
+  register: res
+  changed_when: "'0' in res.stdout"
+
+---
+# Lesson Filters
+# 1
+- name: Task deploy
+  debug:
+    msg: "{{ my_var | default(5) }}"
+
+# 2
+- name: Task deploy
+  file:
+    dest: "{{ item.path }}"
+    state: touch
+    mode: "{{ item.mode | default(omit) }}"
+  loop:
+    - part: "/test"
+    - part: "/test2"
+      mode: "0666"
+
+# 3
+- name: Task deploy
+  vars:
+    admin: true
+  debug:
+    msg: "{{ admin | type_debug }}"
+
+# 4
+- name: Task deploy
+  vars:
+    admin:
+      - key: a
+        value: 1
+      - key: b
+        value: 1
+  debug:
+    msg: "{{ admin | items2dict(key_name='key', value_name='value') }}"
+
+# 5
+- name: Task deploy
+  vars:
+    admin: "true"
+  debug:
+    msg: "{{ admin | bool | type_debug }}"
+
+# 6
+- name: Task deploy
+  vars:
+    admin: { a: 1, b: 3 }
+  debug:
+    msg: "{{ admin | to_nice_yaml }}"
+
+# 7
+- name: Task deploy
+  vars:
+    admin: { a: 1, b: 3 }
+  debug:
+    msg: "{{ admin | combine({'c':2}) }}"
+
+# 8
+- name: Task deploy
+  vars:
+    admin: [1,2,3]
+  debug:
+    msg: "{{ admin | zip['a','b','c'] }}"
+
+# 9
+- name: Task deploy
+  vars:
+    admin: [1,2]
+  debug:
+    msg: "{{ admin | json_query('app.name[*]') }}"
+
+# 10
+- name: Task deploy
+  vars:
+    admin: [1,2]
+  debug:
+    msg: "{{ admin | map('extract', ['a','b','c']) | list }}"
+
+# 11
+- name: Task deploy
+  vars:
+    admin: [1,2]
+  debug:
+    msg: "{{ admin | random }}"
+
+# 12
+- name: Task deploy
+  vars:
+    admin: [1,[2,3]]
+  debug:
+    msg: "{{ admin | flatten }}"
+
+# 13
+- name: Task deploy
+  vars:
+    admin: [1, [2,3], [3,4]]
+  debug:
+    msg: "{{ admin | flatten | unique}}"
+
+# 14
+- name: Task deploy
+  vars:
+    admin: [1,2,3]
+  debug:
+    msg: "{{ admin | intersect([1,2]) }}"
+
+# 15
+- name: Task deploy
+  vars:
+    admin: "https://google.com/values?value=20"
+  debug:
+    msg: "{{ admin | urlsplit('hostname') }}"
+
+# Lesson Loops
+# 1
+- name: Loop
+  vars:
+    data:
+      a: 1
+      b: 2
+  debug:
+    msg: "{{ item.key }} is {{ item.value }}"
+  loop: "{{ data | dict2item }}"
+
+# 2
+- name: Loop
+  vars:
+    data:
+      a: 1
+      b: 2
+  debug:
+    msg: "{{ item.name }} is {{ item.group }}"
+  loop:
+    - { name: "host", group: "admin" }
+    - { name: "host1", group: "admin" }
+
+# 3
+- name: Loop
+  command: echo "{{ item }}"
+  loop:
+    - a
+    - b
+  register: res
+
+- name: Debug
+  debug:
+    var: res
+
+# 4
+- name: Loop
+  debug:
+    msg: "{{ item }}"
+  loop: "{{ groups['all'] }}"
+
+# 5
+- name: Loop
+  debug:
+    msg: "{{ item.name }}"
+  loop:
+    - name: host
+      group: admin
+      roles:
+        admin: true
+        manager: true
+        user: true
+  loop_control:
+    label: "{{ item.name }}"
+
+# 6
+- name: Loop
+  debug:
+    msg: "{{ item.name }}"
+  loop:
+    - name: host
+    - name: host1
+    - name: host2
+  loop_control:
+    pause: 3
+
+# 7
+- name: Loop
+  debug:
+    msg: "{{ item.name }} - {{ my_index }}"
+  loop:
+    - name: host
+    - name: host1
+    - name: host2
+  loop_control:
+    index_var: my_index
+
+# 8
+- name: Loop
+  debug:
+    msg: "{{ item.name }} - {{ ansible_loop.allitems }}"
+  loop:
+    - name: host
+    - name: host1
+    - name: host2
+  loop_control:
+    extended: yes
+
+# 9
+- name: Loop
+  include_tasks: inner.yaml
+  loop:
+    - name: host
+    - name: host1
+    - name: host2
+  loop_control:
+    loop_var: outer_item
+
+# Lesson Lookup
+- name: Task deploy
+  debug:
+    msg: "{{ lookup('file', '../meta/main.yaml', errors='warn') }}"

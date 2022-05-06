@@ -1,0 +1,26 @@
+---
+rmq_defaults:
+  - name: AMQP_EXCHANGE
+    value: xchd_integrations
+  - name: AMQP_USER
+    value: { { rmq.user } }
+  - name: AMQP_PASSWORD
+    value: { { rmq.password } }
+  - name: AMQP_HOSTNAME
+    value: rmq
+
+registry_name: "localhost:5000/"
+
+services:
+  - name: api
+    version: latest
+  - name: app
+    version: latest
+  - name: nginx
+    version: latest
+
+non_build_services:
+  - name: nginx
+    version: latest
+
+advertise_addr: 10.11.10.1

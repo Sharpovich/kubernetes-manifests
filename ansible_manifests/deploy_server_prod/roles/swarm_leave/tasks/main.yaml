@@ -1,0 +1,10 @@
+- name: Down node
+  community.docker.docker_swarm:
+    state: absent
+    force: true
+  delegate_to: "{{ node_name }}"
+
+- name: Remove node
+  community.docker.docker_swarm:
+    state: remove
+    node_id: "{{ node_name }}"

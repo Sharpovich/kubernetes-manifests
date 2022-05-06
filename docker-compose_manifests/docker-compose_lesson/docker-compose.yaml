@@ -1,0 +1,38 @@
+version: '3'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: .apps/api/Dockerfile
+    restart: always
+    container_name:  "${NAME}"
+    volumes:
+    - ./.env:/opt/app/.env
+    env_file:
+      - .env.compose
+    networks:
+      - myNetwork
+    profiles: ["backend"]
+    depends_on:
+      - rmq
+  app:
+    extends:
+      file: docker-compose.api.yaml
+      service: app
+    depends_on:
+      - rmq
+  rmq:
+    image: rabbitmq:3-management
+    restart: always
+    profiles:
+      - queue
+    networks:
+      - myNetwork
+    environment:
+      - USER=admin
+      - PASSWORD=admin
+
+networks:
+  myNetwork:
+    driver: bridge
+

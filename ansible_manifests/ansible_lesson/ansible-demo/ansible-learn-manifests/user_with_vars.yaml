@@ -1,0 +1,24 @@
+---
+- name: user
+  hosts: demo
+# установка переменных
+# интерактивно через консоль
+  vars_prompt:
+    - name: user
+      prompt: "Введите пользователя"
+      private: no
+# или в плейбуке
+  vars:
+    user: host
+# или с помощью файла
+  vars_files:
+    - ./my_vars.yaml
+# или с помощью встроенного модуля group_vars. Подстановка 
+# переменных с помощью создания переменных для группы
+# или с помощью host_vars для определенного хоста
+  tasks:
+    - name: Create user
+      user:
+        name: "{{ user }}"
+        state: present
+      become: true
